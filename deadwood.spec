@@ -1,13 +1,14 @@
-Summary:	A fully recursive caching DNS resolver
+#define debug_package %{nil}
+
+Summary:		A fully recursive caching DNS resolver
 Name:		deadwood
-Version:	3.0.02
-Release:	%mkrel 1
-License:	BSD
+Version:		3.2.02
+Release:		1
+License:		BSD
 Group:		System/Servers
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 URL:		http://www.maradns.org
-Source0:	http://www.maradns.org/%{name}/stable/%{name}-%{version}.tar.bz2
-Source1:	deadwood.init
+Source0:		http://www.maradns.org/%{name}/stable/%{name}-%{version}.tar.bz2
+Source1:		deadwood.init
 Requires(post):	rpm-helper
 
 %description
@@ -37,22 +38,17 @@ cd ../tools
 %make
 
 %install
-rm -rf %{buildroot}
-
 mkdir -p %{buildroot}%{_sbindir}
-install src/Deadwood %{buildroot}/%{_sbindir}/deadwood
-install tools/duende %{buildroot}/%{_sbindir}/duende
+install src/Deadwood %{buildroot}%{_sbindir}/deadwood
+install tools/duende %{buildroot}%{_sbindir}/duende
 mkdir -p %{buildroot}%{_mandir}/man1
 install doc/*.1 %{buildroot}%{_mandir}/man1/
-mkdir -p %{buildroot}/%{_sysconfdir}/maradns/logger
-mkdir -p %{buildroot}/%{_sysconfdir}/%{name}
-mkdir -p %{buildroot}/%{_initrddir}
-install %{SOURCE1} %{buildroot}/%{_initrddir}/deadwood
-install doc/dwood3rc %{buildroot}/%{_sysconfdir}
+mkdir -p %{buildroot}%{_sysconfdir}/maradns/logger
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}
+mkdir -p %{buildroot}%{_initrddir}
+install %{SOURCE1} %{buildroot}%{_initrddir}/deadwood
+install doc/dwood3rc %{buildroot}%{_sysconfdir}
 mkdir -p %{buildroot}%{_logdir}/%{name}
-
-%clean
-rm -rf %{buildroot}/
 
 %pre
 %_pre_useradd %{name} /etc/%{name} /bin/false
@@ -79,9 +75,7 @@ to the valid deadwood uid (`%__grep '^deadwood:' /etc/passwd | %__awk -F ':' '{p
 
 
 %files
-%defattr(-,root,root)
 %doc doc/*
-%attr(755,root,root) %{_sysconfdir}/rc.d/init.d/%{name}
 %dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/maradns/logger
 %attr(750,root,root) %{_initrddir}/%{name}
@@ -90,3 +84,12 @@ to the valid deadwood uid (`%__grep '^deadwood:' /etc/passwd | %__awk -F ':' '{p
 %{_sbindir}/duende
 %{_mandir}/man1/*
 %dir %{_logdir}/%{name}
+
+
+%changelog
+* Tue Feb 01 2011 Lonyai Gergely <aleph@mandriva.org> 3.0.02-1mdv2011.0
++ Revision: 634649
+- 3.0.02
+  initial release
+- create deadwood
+

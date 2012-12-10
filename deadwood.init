@@ -1,0 +1,62 @@
+#! /bin/sh
+#
+# Start/stop Deadwood recursive DNS server
+
+### BEGIN INIT INFO
+# Provides:          deadwood
+# Required-Start:    $network
+# Required-Stop:     $network
+# Should-Start:      $named
+# Should-Stop:       $named
+# Default-Start:     S 2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start the Deadwood recursive DNS server
+# Description:       Start the Deadwood recursive DNS server
+### END INIT INFO
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+NAME=deadwood
+BASE=/usr/sbin/$NAME
+DAEMON="-d"
+CONF="/etc/cherokee/cherokee.conf"
+PIDFILE="/var/run/$NAME.pid"
+
+# Check that $BASE exists.
+[ -f $BASE ] || exit 0
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+
+RETVAL=0
+case "$1" in
+  start)
+        gprintf "Starting %s service: " "Deadwood"
+        /usr/local/bin/duende /usr/sbin/deadwood && success || failure
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/deadwood
+        ;;
+  stop)
+        gprintf "Stutting down %s service: " "Deadwood"
+        killall deadwood && success || failure
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/deadwood
+        ;;
+  restart|reload)
+        $0 stop
+        $0 start
+        RETVAL=$?
+        ;;
+  *)
+        gprintf "Usage: %s {start|stop|restart}" "$NAME"
+        exit 1
+esac
+
+exit $RETVAL
+
