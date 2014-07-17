@@ -1,0 +1,19 @@
+[Unit]
+Description=Start the Deadwood recursive DNS server
+Requires=rpcbind.service
+After=syslog.target network.target
+After=mysqld.service
+After=postgresql.service
+
+[Service]
+Type=forking
+RemainAfterExit=yes
+PIDFile=/run/deadwood.pid
+EnvironmentFile=/etc/sysconfig/network
+EnvironmentFile=/usr/sbin/duende
+ExecStart=/usr/sbin/deadwood
+#ExecStartPost=/usr/sbin/duende
+ExecStop=/usr/sbin/duende
+
+[Install]
+WantedBy=multi-user.target

@@ -1,15 +1,16 @@
 #define debug_package %{nil}
 
-Summary:		A fully recursive caching DNS resolver
+Summary:	A fully recursive caching DNS resolver
 Name:		deadwood
-Version:		3.2.02
-Release:		1
-License:		BSD
+Version:	3.2.02
+Release:	2
+License:	BSD
 Group:		System/Servers
 URL:		http://www.maradns.org
-Source0:		http://www.maradns.org/%{name}/stable/%{name}-%{version}.tar.bz2
-Source1:		deadwood.init
-Requires(post):	rpm-helper
+Source0:	http://www.maradns.org/%{name}/stable/%{name}-%{version}.tar.bz2
+Source1:	deadwood.service
+Source2:	deadwood.tmpfiles.d
+Requires(post,preun):	rpm-helper
 
 %description
 Deadwood is a fully recursive DNS cache. This is a DNS server with the 
@@ -31,7 +32,7 @@ following features:
 %setup -q
 
 %build
-export FLAGS="$RPM_OPT_FLAGS -DIPV6"
+export FLAGS="%{optflags} -DIPV6"
 cd src
 %make
 cd ../tools
@@ -45,22 +46,18 @@ mkdir -p %{buildroot}%{_mandir}/man1
 install doc/*.1 %{buildroot}%{_mandir}/man1/
 mkdir -p %{buildroot}%{_sysconfdir}/maradns/logger
 mkdir -p %{buildroot}%{_sysconfdir}/%{name}
-mkdir -p %{buildroot}%{_initrddir}
-install %{SOURCE1} %{buildroot}%{_initrddir}/deadwood
+mkdir -p %{buildroot}%{_unitdir}
+install %{SOURCE1} %{buildroot}%{_unitdir}/deadwood.service
 install doc/dwood3rc %{buildroot}%{_sysconfdir}
 mkdir -p %{buildroot}%{_logdir}/%{name}
 
+install -p -D -m 0644 %{SOURCE2} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 %pre
 %_pre_useradd %{name} /etc/%{name} /bin/false
 %_pre_groupadd %{name} %{name}
-#if [ $1 = 1 ]
-#	then
-#	/usr/sbin/groupadd -r -g 99 maradns > /dev/null 2>&1
-#	/usr/sbin/useradd -u 99 -r -d /etc/maradns -s /bin/false \
-#	-c "Maradns pseudo user" -g maradns maradns  > /dev/null 2>&1
-#fi
 
 %post
+%tmpfiles_create
 %_post_service %{name}
 cat << EOF
 Please update the maradns_uid and maradns_gid otions in %{_sysconfdir}/dwood3c (line `%__grep -n '^maradns_uid' %{_sysconfdir}/dwood3rc | %__sed 's/:.*$//'`)
@@ -78,18 +75,10 @@ to the valid deadwood uid (`%__grep '^deadwood:' /etc/passwd | %__awk -F ':' '{p
 %doc doc/*
 %dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/maradns/logger
-%attr(750,root,root) %{_initrddir}/%{name}
+%attr(750,root,root) %{_unitdir}/%{name}*
 %config(noreplace) %{_sysconfdir}/dwood3rc
 %{_sbindir}/deadwood
 %{_sbindir}/duende
 %{_mandir}/man1/*
+%{_tmpfilesdir}/*
 %dir %{_logdir}/%{name}
-
-
-%changelog
-* Tue Feb 01 2011 Lonyai Gergely <aleph@mandriva.org> 3.0.02-1mdv2011.0
-+ Revision: 634649
-- 3.0.02
-  initial release
-- create deadwood
-
