@@ -3,7 +3,7 @@
 Summary:	A fully recursive caching DNS resolver
 Name:		deadwood
 Version:	3.2.02
-Release:	2
+Release:	4
 License:	BSD
 Group:		System/Servers
 URL:		http://www.maradns.org
@@ -58,18 +58,18 @@ install -p -D -m 0644 %{SOURCE2} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 
 %post
 %tmpfiles_create
-%_post_service %{name}
+%systemd_post %{name}.service
 cat << EOF
 Please update the maradns_uid and maradns_gid otions in %{_sysconfdir}/dwood3c (line `%__grep -n '^maradns_uid' %{_sysconfdir}/dwood3rc | %__sed 's/:.*$//'`)
 to the valid deadwood uid (`%__grep '^deadwood:' /etc/passwd | %__awk -F ':' '{print $3}'`) and gid (`%__grep '^deadwood:' /etc/passwd | %__awk -F ':' '{print $4}'`)
 
 %preun
-%_preun_service %{name}
+%systemd_preun %{name}.service
 
 %postun
 %_postun_userdel %{name}
 %_postun_groupdel %{name}
-
+%systemd_postun_with_restart %{name}.service
 
 %files
 %doc doc/*
