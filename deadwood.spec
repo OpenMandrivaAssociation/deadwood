@@ -3,7 +3,7 @@
 Summary:	A fully recursive caching DNS resolver
 Name:		deadwood
 Version:	3.2.02
-Release:	4
+Release:	5
 License:	BSD
 Group:		System/Servers
 URL:		http://www.maradns.org
