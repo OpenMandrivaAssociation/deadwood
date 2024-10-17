@@ -6,7 +6,7 @@ Version:	3.2.02
 Release:	5
 License:	BSD
 Group:		System/Servers
-URL:		http://www.maradns.org
+URL:		https://www.maradns.org
 Source0:	http://www.maradns.org/%{name}/stable/%{name}-%{version}.tar.bz2
 Source1:	deadwood.service
 Source2:	deadwood.tmpfiles.d
